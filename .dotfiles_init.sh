@@ -8,14 +8,12 @@ function dotfiles {
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" $@
 }
 
-mkdir -p "$HOME/.dotfiles_backup"
-
 dotfiles checkout
 if [ $? = 0 ];then
 	echo "Successfully changed dotfiles";
 else 
 	read -p "Press Enter to continue and delete problematic files";
-	dotfiles checkout 2>&1 | grep -E "\s+\." | awk {'print $1'} | xargs -I{} rm -rf {} $HOME/.dotfiles_backup/{}
+	dotfiles checkout 2>&1 | grep -E "\s+\." | awk {'print $1'} | xargs -I{} rm -rf {} $HOME/{}
 fi;
 dotfiles checkout
 dotfiles config status.showUntrackedFiles no
