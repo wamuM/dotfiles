@@ -1,7 +1,7 @@
 # List of user defined aliases
 
-## reset 
-alias reset='source $HOME/.bashrc && echo .bashrc sourced correctly!'
+## refresh
+alias refresh='source $HOME/.bashrc && echo .bashrc sourced correctly!'
 
 ## ls 
 alias ls='ls --color=auto'
