@@ -1,0 +1,8 @@
+[user]
+	email = contact@wamu-m.com
+	name = wamu_M
+	signingkey = A1F226C3D73BFED11DDE9F921E2E4417F8B2D426
+[commit]
+	gpgsign = true
+[gpg]
+	program = gpg
