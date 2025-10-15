@@ -20,3 +20,8 @@ alias cls='clear && fastfetch'
 
 ## emacs
 alias emacs='echo Did you mean vim?'
+
+## Power
+alias poweroff="systemctl poweroff"
+alias reboot="systemctl reboot"
+alias suspend="systemctl suspend"

@@ -67,5 +67,4 @@ if [ -d ~/.bashrc.d ]; then
 fi
 
 unset rc
-
-# Anything bellow this line has been rudely added by the classic echo >>.basrch
+# Anything bellow this line has been rudely added by the classic echo >>.bashrc
