@@ -3,7 +3,7 @@
 # ======================================
 # General environment variables
 
-export EDITOR="/usr/bin/nvim"
-export VISUAL="/usr/bin/nvim"
+export EDITOR="nvim"
+export VISUAL="nvim"
 
 export GPG_TTY=$(tty)
