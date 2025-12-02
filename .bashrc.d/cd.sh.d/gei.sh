@@ -4,10 +4,8 @@
 # ==============================
 # cd alias for ~/Documents/GEI
 
-cd "$HOME/Documents/GEI" 
-
 if [ $# -eq 1 ]; then
-	cd $(echo "$1" | tr "[:lower:]" "[:upper:]") 
+	cd "$HOME/Documents/GEI"/$(echo "$1" | tr "[:lower:]" "[:upper:]") 
 fi
 
 if [ $# -gt 1 ]; then

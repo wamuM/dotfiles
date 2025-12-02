@@ -56,7 +56,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-
 # User specific aliases and functions
 if [ -d ~/.bashrc.d ]; then
 	for rc in ~/.bashrc.d/*; do
