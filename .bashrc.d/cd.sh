@@ -6,7 +6,7 @@
 CD_SH_D="$HOME/.bashrc.d/cd.sh.d/"
 
 ## GEI
-export $D_GEI="$HOME/Documents/GEI"
+export D_GEI="$HOME/Documents/GEI"
 alias gei="source $CD_SH_D/gei.sh"
 
 ### Git
