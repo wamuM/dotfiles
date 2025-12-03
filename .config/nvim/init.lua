@@ -1,3 +1,6 @@
+-- Set <leader> to " "
+vim.g.mapleader = " "
+
 require("config.lazy")
 
 --  Long Lines
