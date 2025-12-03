@@ -19,3 +19,8 @@ vim.opt.expandtab = true
 
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
+
+
+-- Remove highlighting if escaping in normalmode 
+vim.keymap.set("n", "<esc>", function() vim.cmd('nohlsearch') end, { noremap=true, silent = true })
+
