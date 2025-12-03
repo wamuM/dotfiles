@@ -26,6 +26,6 @@ require("lazy").setup({
   spec = {
   	{ import = "config.plugins" }
   },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
+  -- automatically check for plugin updates but don't show a popup
+  checker = { enabled = true, notify=false },
 })
