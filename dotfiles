@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+SCRIPT_PATH=$(which $0) # This gives us the folder where this script is located
+DOTFILES_DIR="${SCRIPT_PATH%/*}"
+export DOTFILES_DIR
+
+usage() {
+    echo "[?] Usage: dotfiles " >&2
+}
+
+call(){
+    script=$1
+    shift
+    "$DOTFILES_DIR/$script" $@
+    if [[ $? != 0 ]];then
+        exit $?
+    fi
+}
+
+
+SUBCOMMAND=$1
+shift
+case "$SUBCOMMAND" in 
+    apply|a|add)
+        call dotfiles_apply $@
+        echo "[=] Module sucessfully applied!"
+        ;;
+    remove|revert|r|delete|deactivate)
+        call dotfiles_remove $@
+        echo "[=] Module successfully removed"
+        ;;
+    help|h|man|--help|-h)
+        exec 2>&1
+        usage
+        ;;
+    *)
+        echo "[!] Fatal: Unknown command '$SUBCOMMAND'" >&2
+        usage
+        exit 255;
+        ;;
+esac
+
+

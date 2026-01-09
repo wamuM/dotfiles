@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Args: <module> 
+
+if [[ $# -lt 1 ]]; then
+    echo "[!] Fatal: Wrong argument count" >&2
+    exit 1
+fi
+
+if [[ -z "$DOTFILES_DIR" ]]; then
+    echo "[!] Fatal: DOTFILES_DIR is not set" >&2
+    echo "    this usually happens when someone tries to execute 'dotfiles_apply' directly" >&2
+    echo "    which is not recommended. Instead use 'dotfiles apply' which is a wrapper that" >&2
+    echo "    sets all required environment variables." >&2
+    exit 2
+fi
+MODULE="$DOTFILES_DIR/$1"
+
+if [[ -d "$MODULE" ]];then
+    echo "[+] Removing module '$1'"
+else
+    echo "[!] Fatal: Module '$1' doesn't exist" >&2
+    exit 3
+fi
+
+if [[ ! -f "$MODULE/.target" ]]; then
+    echo "[!] Fatal: Module corrupted " >&2
+    echo "    Modules are expected to have a .target file" >&2
+    exit 4
+fi
+
+TARGET=$(<"$MODULE/.target")
+echo "[+] Targeting '$TARGET'"
+
+if [[ ! -d "$TARGET" ]]; then
+    echo "[!] Fatal: The target directory '$TARGET' does not exist"
+    exit 6
+fi
+stow --target "$TARGET"    \
+     --dir "$DOTFILES_DIR" \
+     --ignore=".target"    \
+     --verbose             \
+     --delete              \
+     $1 2>&1
+
+if [[ $? != 0 ]];then
+    echo "[!] Fatal: An error happened with stow"
+    exit 7
+fi
+
+echo "[=] All '$1' symlinks successfully removed"
+
+shift 
+if [[ $# -gt 0 ]];then
+    "$0" $@
+fi
+
