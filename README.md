@@ -1,6 +1,5 @@
 Dotfiles Repository
 ===================
-
 ## Stow vs Bare repo: my usecase 
 My previous config used to be managed via a [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) 
 and it was a great experience, I would definitively recommend it. 
@@ -29,14 +28,16 @@ Which is why I needed a more hybrid approach that would let me do the following:
 After some research I found that the best way to match those needs was using [stow](https://www.youtube.com/watch?v=y6XCebnB9gs)
 
 ## How it works 
+It is highly recommended to add `./dotfiles` to the path or creating an alias for it. 
 
+You can use ``./dotfiles help`` for more info
 ## Complementary configuration systems
 As I explained before, I have various kinds of machines with different configuration needs. 
 They can be grouped into the following categories:
 - Bare Linux: These computers only use this repository for configuration 
 - [QubesOS](qubes): dom0 uses [my saltstack](https://github.com/wamuM/qubes-salt) config 
   which interally uses this repo for the VMs as if they were bare linux machines.
-- [NixOS](nix): they use my [nixos-config repo](https://github.com/nixos-config) which interally uses this repo and
+- [NixOS](nix): they use my [nixos-config repo](https://github.com/wamuM/nixos-config) which interally uses this repo and
   [home-manager](hm) 
 ## Dependencies 
 For this to work you need to have the following programs installed:
