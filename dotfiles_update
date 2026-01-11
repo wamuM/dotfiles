@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if [[ -z "$DOTFILES_DIR" ]]; then
+    echo "[!] Fatal: DOTFILES_DIR is not set" >&2
+    echo "    this usually happens when someone tries to execute 'dotfiles_update' directly" >&2
+    echo "    which is not recommended. Instead use 'dotfiles update' which is a wrapper that" >&2
+    echo "    sets all required environment variables." >&2
+    exit 1
+fi
+
+echo "[#] Removing list"
+$DOTFILES_DIR/dotfiles_remove "$@"
+if (( $? != 0 )); then
+    echo "[!!!] FATAL: Removing failed " >&2
+    echo "   some modules might have been removed, whilst other's haven't" >&2
+    echo "   there might even some partially removed modules" >&2
+fi
+echo "[#] Adding list"
+$DOTFILES_DIR/dotfiles_apply "$@"
+if (( $? != 0 )); then
+    echo "[!!!] FATAL: Adding failed " >&2
+    echo "   some modules might have been removed, whilst other's haven't" >&2
+    echo "   there might even some partially added modules" >&2
+fi
