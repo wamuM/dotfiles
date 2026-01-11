@@ -1,1 +1,1 @@
-cd $(pwd)
+cd $(realpath .)

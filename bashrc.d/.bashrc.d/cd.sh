@@ -12,4 +12,6 @@ alias gei="source $CD_SH_D/gei.sh"
 ### Git
 alias cdgit="source $CD_SH_D/cdgit.sh"
 
+## Real CD
+alias rcd="source $CD_SH_D/rcd.sh"
 unset CD_SH_D
