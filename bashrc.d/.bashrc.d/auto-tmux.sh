@@ -1,1 +1,0 @@
-../../auto-tmux/auto-tmux.sh
