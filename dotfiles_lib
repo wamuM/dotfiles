@@ -9,10 +9,11 @@ if [ -t 1 ];then
     RED_OUT=$RED;
     BLUE_OUT=$BLUE;
     GREEN_OUT=$GREEN;
+    YELLOW_OUT=$YELLOW;
     BOLD_OUT=$BOLD;
     OFF_OUT=$OFF;
 else
-    RED_OUT="";BLUE_OUT="";GREEN_OUT="";BOLD_OUT="";OFF_OUT="";
+    RED_OUT="";BLUE_OUT="";GREEN_OUT="";BOLD_OUT="";OFF_OUT="";YELLOW_OUT="";
 fi
 
 if [ -t 2 ];then

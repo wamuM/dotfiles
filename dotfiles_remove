@@ -66,8 +66,30 @@ if (( $dep_count <= 0 ));then
     fi
 
     echo "0" > "$MODULE/.dep_count"
-
-    msg = "module '$1' has been removed" 
+    
+    if (( $dep_count < 0 ));then
+        msg - "module '$1' was already removed"
+    else
+        msg = "module '$1' has been removed" 
+    
+        # Get all dependencies 
+        mapfile -t DEPENDENCIES < <(process "$MODULE/.dependencies") 
+        if (( ${#DEPENDENCIES[@]} > 0 )); then
+            msg H "Module '$1' has the following dependencies:"
+            FLAGGED=()
+            for dep in "${DEPENDENCIES[@]}"; do
+                    FLAGGED+=("-d" "$dep")
+                    msg . "- $dep"
+            done
+            msg H "Removing dependencies next"
+            "$0" "${FLAGGED[@]}"
+            if (($? != 0 ));then
+                msg ! "Removing dependencies for module '$1' failed"
+                exit $?
+            fi
+            msg + "Module '$1' dependencies successfully removed"
+        fi
+    fi
 else 
     if (( $IS_DEP == 0 ));then
         msg + "Removing manually installed flag"
@@ -77,27 +99,9 @@ else
     msg + "Skipping module '$1' because it's still a dependency"
 fi
 
-# Get all dependencies 
-mapfile -t DEPENDENCIES < <(process "$MODULE/.dependencies") 
-if (( ${#DEPENDENCIES[@]} > 0 )); then
-    msg H "Module '$1' has the following dependencies:"
-    FLAGGED=()
-    for dep in "${DEPENDENCIES[@]}"; do
-            FLAGGED+=("-d" "$dep")
-            msg . "- $dep"
-    done
-    msg H "Removing dependencies next"
-    "$0" "${FLAGGED[@]}"
-    if (($? != 0 ));then
-        msg ! "Removing dependencies for module '$1' failed"
-        exit $?
-    fi
-    msg + "Module '$1' dependencies successfully removed"
-fi
-
 shift 
 if (( $# > 0 ));then
-    msg H "Proceeding with next item (module '$1')"
+    msg H "Proceeding with next item"
     exec "$0" "$@"
 fi
 

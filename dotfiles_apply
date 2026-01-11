@@ -101,6 +101,6 @@ fi
 
 shift 
 if (( $# > 0 ));then
-    msg H "Proceeding with next item (module '$1')"
+    msg H "Proceeding with next item"
     exec "$0" "$@"
 fi

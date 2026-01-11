@@ -19,9 +19,9 @@ for module in "$DOTFILES_DIR"/*;do
         fi
         dep_count=$(<"$module/.dep_count")
         if [[ -e "$module/.is_not_dep" ]];then
-            msg . "- ${module##*/}: [ACTIVATED] dependency to $((dep_count - 1)) modules"
+            msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
         else 
-            msg . "- ${module##*/}: dependency to $dep_count modules"
+            msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
         fi
     fi
 done
