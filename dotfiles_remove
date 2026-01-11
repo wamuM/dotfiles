@@ -8,8 +8,8 @@ fi
 
 if [[ -z "$DOTFILES_DIR" ]]; then
     echo "[!] Fatal: DOTFILES_DIR is not set" >&2
-    echo "    this usually happens when someone tries to execute 'dotfiles_apply' directly" >&2
-    echo "    which is not recommended. Instead use 'dotfiles apply' which is a wrapper that" >&2
+    echo "    this usually happens when someone tries to execute '$0' directly" >&2
+    echo "    which is not recommended. Instead use '${0//_/ }' which is a wrapper that" >&2
     echo "    sets all required environment variables." >&2
     exit 2
 fi
@@ -27,45 +27,48 @@ if (( $? != 0 ));then
     exit $?
 fi
 
-TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
-TARGET="${TARGET/#\~/$HOME}" 
-echo "[+] Targeting '$TARGET'"
-
-if [[ ! -d "$TARGET" ]]; then
-    echo "[!] Fatal: The target directory '$TARGET' does not exist"
-    exit 6
-fi
+DEPENDENCIES=()
 
 dep_count=0
 read -r dep_count <  "$MODULE/.dep_count"
 ((dep_count--))
-if (( $dep_count < 0 ));then 
-    dep_count=0
-fi
-echo "$dep_count" > "$MODULE/.dep_count"
-
-DEPENDENCIES=()
-if (( $dep_count == 0 ));then
-    stow --target "$TARGET"    \
-         --dir "$DOTFILES_DIR" \
-         --verbose             \
-         --delete              \
-         $1 2>&1
-
-    if [[ $? != 0 ]];then
-        echo "[!] Fatal: An error happened with stow"
-        exit 7
+if (( $dep_count >= 0 ));then 
+    TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
+    TARGET="${TARGET/#\~/$HOME}" 
+    echo "[+] Targeting '$TARGET'"
+    
+    if [[ ! -d "$TARGET" ]]; then
+        echo "[!] Fatal: The target directory '$TARGET' does not exist"
+        exit 6
     fi
     
-    echo "[=] All '$1' symlinks successfully removed"
     
-    if [[ -e "$MODULE/.is_not_dep" ]];then
-        rm "$MODULE/.is_not_dep"
+    echo "$dep_count" > "$MODULE/.dep_count"
+    
+    if (( $dep_count == 0 ));then
+        stow --target "$TARGET"    \
+             --dir "$DOTFILES_DIR" \
+             --verbose             \
+             --delete              \
+             $1 2>&1
+    
+        if [[ $? != 0 ]];then
+            echo "[!] Fatal: An error happened with stow"
+            exit 7
+        fi
+        
+        echo "[=] All '$1' symlinks successfully removed"
+        
+        if [[ -e "$MODULE/.is_not_dep" ]];then
+            rm "$MODULE/.is_not_dep"
+        fi
+        
+        mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
+    else
+        echo "[+] Skipped because it's still a dependency"
     fi
-    
-    mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
-else
-    echo "[+] Skipped because it's still a dependency"
+else 
+    echo "[=] Skipped because it has already been completely removed"
 fi
 
 shift 

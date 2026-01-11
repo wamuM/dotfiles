@@ -37,55 +37,65 @@ if (( $? != 0 ));then
     exit $?
 fi
 
-TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
-TARGET="${TARGET/#\~/$HOME}" 
-echo "[+] Targeting '$TARGET'"
+read -r dep_count <  "$MODULE/.dep_count"
+((dep_count++))
+if [[ ! -e "$MODULE/.is_not_dep" ]];then
 
-if [[ ! -d "$TARGET" ]]; then
-    echo "[!] Fatal: The target directory '$TARGET' does not exist or is not a directory"
-    exit 6
-fi
-
-stow --target "$TARGET"    \
-     --dir "$DOTFILES_DIR" \
-     --ignore="$MODULE/.target"    \
-     --ignore="$MODULE/.stow-local-ignore" \
-     --ignore="$MODULE/.dependencies" \
-     --ignore="$MODULE/.is_not_dep" \
-     --ignore="$MODULE/.dep_count" \
-     --ignore="$MODULE/.gitignore" \
-     --verbose             \
-     $1 2>&1
-
-if (( $? != 0 ));then
-    echo "[!] Fatal: An error happened with stow"
-    exit 7
-fi
-
-
-if [[ $IS_DEP -eq 1 ]];then
-    read -r dep_count <  "$MODULE/.dep_count"
-    ((dep_count++))
-    echo "$dep_count" > "$MODULE/.dep_count"
+    mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
+    if (( ${#DEPENDENCIES[@]} > 0 ));then 
+        echo "[+] Adding dependencies to list"
+        printf '  - %s\n' "${DEPENDENCIES[@]}"
+        echo "[#] Applying dependencies first"
+        FLAGGED=()
+        for dep in "${DEPENDENCIES[@]}"; do
+            FLAGGED+=("-d" "$dep")
+        done
+        "$0" "${FLAGGED[@]}"
+        echo "[+] Dependencies applied"
+        echo "[#] Applying main module '$1' now"
+    fi
+    
+    TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
+    TARGET="${TARGET/#\~/$HOME}" 
+    echo "[+] Targeting '$TARGET'"
+    
+    if [[ ! -d "$TARGET" ]]; then
+        echo "[!] Fatal: The target directory '$TARGET' does not exist or is not a directory"
+        exit 6
+    fi
+    
+    
+    stow --target "$TARGET"                 \
+         --dir "$DOTFILES_DIR"              \
+         --ignore="^\.target$"              \
+         --ignore="^\.stow-local-ignore$"   \
+         --ignore="^\.dependencies$"        \
+         --ignore="^\.is_not_dep$"          \
+         --ignore="^\.dep_count$"           \
+         --ignore="^\.gitignore$"           \
+         --verbose                          \
+         $1 2>&1
+    
+    if (( $? != 0 ));then
+        echo "[!] Fatal: An error happened with stow"
+        exit 7
+    fi
+    
+    echo "[=] All '$1' symlinks successfully created"
+    
+    if (( $IS_DEP == 0 ));then
+        touch "$MODULE/.is_not_dep"
+    fi
+    echo "$dep_count" > "$MODULE/.dep_count"  #if it hasn't been applied add count 
 else 
-    echo "1" > "$MODULE/.dep_count"
-    touch "$MODULE/.is_not_dep"
-fi
-
-echo "[=] All '$1' symlinks successfully created"
-
-mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
-if (( ${#DEPENDENCIES[@]} > 0 ));then 
-    echo "[+] Adding dependencies to list"
-    printf '  - %s\n' "${DEPENDENCIES[@]}"
+    if (( $IS_DEP == 1 ));then #if it has already been applied, but it's a dependency, add count
+        echo "$dep_count" > "$MODULE/.dep_count"
+    fi
+    echo "[=] Module has already been applied, skipping"
 fi
 
 shift 
-if (( $# > 0 || ${#DEPENDENCIES[@]} > 0 ));then
-    FLAGGED=()
-    for dep in "${DEPENDENCIES[@]}"; do
-        FLAGGED+=("-d" "$dep")
-    done
+if (( $# > 0 ));then
     echo "[#] Proceeding with next item"
-    exec "$0" $@ "${FLAGGED[@]}"
+    exec "$0" "$@"
 fi

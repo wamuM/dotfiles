@@ -23,11 +23,11 @@ shift
 case "$SUBCOMMAND" in 
     apply|a|add)
         call dotfiles_apply $@
-        echo "[=] Module sucessfully applied!"
+        echo "[=] All module sucessfully applied!"
         ;;
     remove|revert|r|delete|deactivate)
         call dotfiles_remove $@
-        echo "[=] Module successfully deactivated"
+        echo "[=] All module successfully deactivated!"
         ;;
     help|h|man|--help|-h)
         exec 2>&1
