@@ -22,35 +22,58 @@ else
     exit 3
 fi
 
-if [[ ! -f "$MODULE/.target" ]]; then
-    echo "[!] Fatal: Module corrupted " >&2
-    echo "    Modules are expected to have a .target file" >&2
-    exit 4
+"$DOTFILES_DIR/validity_check" "$MODULE"
+if (( $? != 0 ));then
+    exit $?
 fi
 
-TARGET=$(<"$MODULE/.target")
+TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
+TARGET="${TARGET/#\~/$HOME}" 
 echo "[+] Targeting '$TARGET'"
 
 if [[ ! -d "$TARGET" ]]; then
     echo "[!] Fatal: The target directory '$TARGET' does not exist"
     exit 6
 fi
-stow --target "$TARGET"    \
-     --dir "$DOTFILES_DIR" \
-     --ignore=".target"    \
-     --verbose             \
-     --delete              \
-     $1 2>&1
 
-if [[ $? != 0 ]];then
-    echo "[!] Fatal: An error happened with stow"
-    exit 7
+dep_count=0
+read -r dep_count <  "$MODULE/.dep_count"
+((dep_count--))
+if (( $dep_count < 0 ));then 
+    dep_count=0
 fi
+echo "$dep_count" > "$MODULE/.dep_count"
 
-echo "[=] All '$1' symlinks successfully removed"
+DEPENDENCIES=()
+if (( $dep_count == 0 ));then
+    stow --target "$TARGET"    \
+         --dir "$DOTFILES_DIR" \
+         --verbose             \
+         --delete              \
+         $1 2>&1
+
+    if [[ $? != 0 ]];then
+        echo "[!] Fatal: An error happened with stow"
+        exit 7
+    fi
+    
+    echo "[=] All '$1' symlinks successfully removed"
+    
+    if [[ -e "$MODULE/.is_not_dep" ]];then
+        rm "$MODULE/.is_not_dep"
+    fi
+    
+    mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
+else
+    echo "[+] Skipped because it's still a dependency"
+fi
 
 shift 
-if [[ $# -gt 0 ]];then
-    "$0" $@
+if (( $# > 0 || ${#DEPENDENCIES[@]} > 0 ));then
+    echo "[#] Proceeding with next item"
+    exec "$0" $@ "${DEPENDENCIES[@]}"
 fi
+
+
+
 

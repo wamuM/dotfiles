@@ -2,10 +2,18 @@
 
 # Args: <module> 
 
+IS_DEP=0;
+if [[ "$1" == "-d" || "$1" == "--dependency" ]];then
+    shift
+    echo "[+] Dependency flag activated"
+    IS_DEP=1;
+fi
+
 if [[ $# -lt 1 ]]; then
     echo "[!] Fatal: Wrong argument count" >&2
     exit 1
 fi
+
 
 if [[ -z "$DOTFILES_DIR" ]]; then
     echo "[!] Fatal: DOTFILES_DIR is not set" >&2
@@ -23,38 +31,60 @@ else
     exit 3
 fi
 
-if [[ ! -f "$MODULE/.target" ]]; then
-    echo "[!] Fatal: Module corrupted " >&2
-    echo "    Modules are expected to have a .target file" >&2
-    exit 4
+
+"$DOTFILES_DIR/validity_check" "$MODULE"
+if (( $? != 0 ));then
+    exit $?
 fi
 
-if [[ ! -f "$MODULE/.stow-local-ignore" ]]; then
-    echo "[!] Fatal: Module corrupted " >&2
-    echo "    Modules are expected to have a .stow-local-ignore file" >&2
-    exit 5
-fi
-
-TARGET=$(<"$MODULE/.target")
+TARGET="$("$DOTFILES_DIR/process" "$MODULE/.target")"
+TARGET="${TARGET/#\~/$HOME}" 
 echo "[+] Targeting '$TARGET'"
 
 if [[ ! -d "$TARGET" ]]; then
-    echo "[!] Fatal: The target directory '$TARGET' does not exist"
+    echo "[!] Fatal: The target directory '$TARGET' does not exist or is not a directory"
     exit 6
 fi
+
 stow --target "$TARGET"    \
      --dir "$DOTFILES_DIR" \
      --ignore=".target"    \
+     --ignore=".stow-local-ignore" \
+     --ignore=".dependencies" \
+     --ignore=".is_not_dep" \
+     --ignore=".dep_count" \
      --verbose             \
      $1 2>&1
 
-if [[ $? != 0 ]];then
+if (( $? != 0 ));then
     echo "[!] Fatal: An error happened with stow"
     exit 7
 fi
 
+
+if [[ $IS_DEP -eq 1 ]];then
+    read -r dep_count <  "$MODULE/.dep_count"
+    ((dep_count++))
+    echo "$dep_count" > "$MODULE/.dep_count"
+else 
+    echo "1" > "$MODULE/.dep_count"
+    touch "$MODULE/.is_not_dep"
+fi
+
 echo "[=] All '$1' symlinks successfully created"
+
+mapfile -t DEPENDENCIES < <("$DOTFILES_DIR/process" "$MODULE/.dependencies")
+if (( ${#DEPENDENCIES[@]} > 0 ));then 
+    echo "[+] Adding dependencies to list"
+    printf '  - %s\n' "${DEPENDENCIES[@]}"
+fi
+
 shift 
-if [[ $# -gt 0 ]];then
-    "$0" $@
+if (( $# > 0 || ${#DEPENDENCIES[@]} > 0 ));then
+    FLAGGED=()
+    for dep in "${DEPENDENCIES[@]}"; do
+        FLAGGED+=("-d" "$dep")
+    done
+    echo "[#] Proceeding with next item"
+    exec "$0" $@ "${FLAGGED[@]}"
 fi

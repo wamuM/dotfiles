@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if [[ ! -f "$1/.target" ]]; then
+    echo "[!] Fatal: Module corrupted " >&2
+    echo "    Modules are expected to have a .target file" >&2
+    exit 4
+fi
+
+if [[ ! -f "$1/.stow-local-ignore" ]]; then
+    echo "[!] Fatal: Module corrupted " >&2
+    echo "    Modules are expected to have a .stow-local-ignore file" >&2
+    exit 5
+fi
+
+if [[ ! -f "$1/.dependencies" ]]; then
+    echo "[!] Fatal: Module corrupted " >&2
+    echo "    Modules are expected to have a .dependencies file" >&2
+    exit 6
+fi
+
+if [[ ! -f "$1/.dep_count" ]]; then
+    echo "[!] Fatal: Module corrupted " >&2
+    echo "    Modules are expected to have a .dep_count file" >&2
+    exit 7
+fi
+
