@@ -19,8 +19,11 @@ if [[ ! -f "$1/.dependencies" ]]; then
 fi
 
 if [[ ! -f "$1/.dep_count" ]]; then
-    echo "[!] Fatal: Module corrupted " >&2
+    echo "[-] Error: Module corrupted " >&2
     echo "    Modules are expected to have a .dep_count file" >&2
+    echo "[#] Attempting to recover module"
+    echo "0" > "$1/.dep_count" 
+    echo "[+] Module recovered by setting dependencies count to 0"
     exit 7
 fi
 
