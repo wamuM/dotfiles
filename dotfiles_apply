@@ -48,11 +48,12 @@ fi
 
 stow --target "$TARGET"    \
      --dir "$DOTFILES_DIR" \
-     --ignore=".target"    \
-     --ignore=".stow-local-ignore" \
-     --ignore=".dependencies" \
-     --ignore=".is_not_dep" \
-     --ignore=".dep_count" \
+     --ignore="$MODULE/.target"    \
+     --ignore="$MODULE/.stow-local-ignore" \
+     --ignore="$MODULE/.dependencies" \
+     --ignore="$MODULE/.is_not_dep" \
+     --ignore="$MODULE/.dep_count" \
+     --ignore="$MODULE/.gitignore" \
      --verbose             \
      $1 2>&1
 
