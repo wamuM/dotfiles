@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-echo "[=] List of applied modules:"
+
+if [[ -z "$DOTFILES_DIR" ]]; then
+    echo "[!] Fatal: DOTFILES_DIR is not set" >&2
+    echo "    this usually happens when someone tries to execute 'dotfiles_list' directly" >&2
+    echo "    which is not recommended. Instead use 'dotfiles list' which is a wrapper that" >&2
+    echo "    sets all required environment variables." >&2
+    exit 2
+fi
+
+echo "[=] List of modules:"
 for module in "$DOTFILES_DIR"/*;do
     if [ -d "$module" ];then
         dep_count=$(<"$module/.dep_count")

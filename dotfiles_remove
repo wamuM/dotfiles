@@ -8,8 +8,8 @@ fi
 
 if [[ -z "$DOTFILES_DIR" ]]; then
     echo "[!] Fatal: DOTFILES_DIR is not set" >&2
-    echo "    this usually happens when someone tries to execute '$0' directly" >&2
-    echo "    which is not recommended. Instead use '${0//_/ }' which is a wrapper that" >&2
+    echo "    this usually happens when someone tries to execute 'dotfiles_remove' directly" >&2
+    echo "    which is not recommended. Instead use 'dotfiles remove' which is a wrapper that" >&2
     echo "    sets all required environment variables." >&2
     exit 2
 fi
