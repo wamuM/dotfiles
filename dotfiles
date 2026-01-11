@@ -4,7 +4,11 @@ SCRIPT_PATH=$(which $0) # This gives us the folder where this script is located
 DOTFILES_DIR="${SCRIPT_PATH%/*}"
 export DOTFILES_DIR
 
+
+source "$DOTFILES_DIR/dotfiles_lib"
+
 usage() {
+    msg ? "Usage: dotfiles <subcommand>"
     cat $DOTFILES_DIR/dotfiles_help.txt >&2
 }
 
@@ -23,11 +27,11 @@ shift
 case "$SUBCOMMAND" in 
     apply|a|add)
         call dotfiles_apply $@
-        echo "[=] All module sucessfully applied!"
+        msg = All modules applied
         ;;
     remove|revert|r|delete|deactivate)
         call dotfiles_remove $@
-        echo "[=] All module successfully deactivated!"
+        msg = All modules removed
         ;;
     help|h|man|--help|-h)
         exec 2>&1
@@ -37,7 +41,7 @@ case "$SUBCOMMAND" in
         call dotfiles_list $@
         ;;
     *)
-        echo "[!] Fatal: Unknown command '$SUBCOMMAND'" >&2
+        msg ! "Unknown command '$SUBCOMMAND'"
         usage
         exit 255;
         ;;

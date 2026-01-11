@@ -8,19 +8,20 @@ if [[ -z "$DOTFILES_DIR" ]]; then
     echo "    sets all required environment variables." >&2
     exit 2
 fi
+source "$DOTFILES_DIR/dotfiles_lib"
 
-echo "[=] List of modules:"
+msg + "List of modules:"
 for module in "$DOTFILES_DIR"/*;do
     if [ -d "$module" ];then
-        "$DOTFILES_DIR/validity_check" "$module"
+        check_integrity "$module"
         if (( $? != 0 ));then
-            echo "[!] validity check exited with error code $?"
+            msg ! "Integrity check failed with error code $1"
         fi
         dep_count=$(<"$module/.dep_count")
         if [[ -e "$module/.is_not_dep" ]];then
-            echo "  - ${module##*/}: [ACTIVATED] dependency to $((dep_count - 1)) modules"
+            msg . "- ${module##*/}: [ACTIVATED] dependency to $((dep_count - 1)) modules"
         else 
-            echo "  - ${module##*/}: dependency to $dep_count modules"
+            msg . "- ${module##*/}: dependency to $dep_count modules"
         fi
     fi
 done

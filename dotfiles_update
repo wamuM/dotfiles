@@ -8,17 +8,18 @@ if [[ -z "$DOTFILES_DIR" ]]; then
     exit 1
 fi
 
-echo "[#] Removing list"
+source "$DOTFILES/dotfiles_lib"
+msg H UPDATE: Removing list
 $DOTFILES_DIR/dotfiles_remove "$@"
 if (( $? != 0 )); then
-    echo "[!!!] FATAL: Removing failed " >&2
+    msg !!! "Removing failed!"
     echo "   some modules might have been removed, whilst other's haven't" >&2
     echo "   there might even some partially removed modules" >&2
 fi
-echo "[#] Adding list"
+msg H UPDATE: Adding list
 $DOTFILES_DIR/dotfiles_apply "$@"
 if (( $? != 0 )); then
-    echo "[!!!] FATAL: Adding failed " >&2
+    msg !!! "Adding failed!"
     echo "   some modules might have been removed, whilst other's haven't" >&2
     echo "   there might even some partially added modules" >&2
 fi

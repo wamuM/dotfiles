@@ -1,4 +1,3 @@
-[?] Usage: dotfiles <subcommand> <module1> ... <moduleN> 
     - dotfiles help|h|-h
         Prints this message into stdout
 

@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+BOLD="\e[1m"
+OFF="\e[0m"
+if [ -t 1 ];then
+    RED_OUT=$RED;
+    BLUE_OUT=$BLUE;
+    GREEN_OUT=$GREEN;
+    BOLD_OUT=$BOLD;
+    OFF_OUT=$OFF;
+else
+    RED_OUT="";BLUE_OUT="";GREEN_OUT="";BOLD_OUT="";OFF_OUT="";
+fi
+
+if [ -t 2 ];then
+    RED_ERR=$RED;
+    YELLOW_ERR=$YELLOW;
+    BOLD_ERR=$BOLD;
+    OFF_ERR=$OFF;
+else
+    RED_ERR="";YELLOW_ERR="";BOLD_ERR="";OFF_ERR="";
+fi
+msg(){
+    if (($# < 2 )); then
+        echo "[!!!] BUG: Error when calling err_msg" >&2
+        echo "      there needs to be two parameters provided" >&2
+        exit 255;
+    fi
+    
+    type="$1"
+    shift
+    case "$type" in
+        "!")
+            echo -e "[${RED_ERR}!${OFF_ERR}] ${BOLD_ERR}Fatal:${OFF_ERR} $@">&2
+        ;;
+        "-")
+            echo -e "[${RED_ERR}-${OFF_ERR}] Error: $@" >&2
+        ;;
+        "!!!")
+            echo -e "[${RED_ERR}!!!${OFF_ERR}] ${BOLD_ERR} FATAL: $@ ${OFF_ERR}" >&2
+        ;;
+        "%")
+            echo -e "[${YELLOW_ERR}%${OFF_ERR}] Warning: $@" >&2
+        ;;
+        "#"|"H")
+            echo -e "[${BLUE_OUT}#${OFF_OUT}] $@"
+        ;;
+        "+")
+            echo -e "[${GREEN_OUT}+"${OFF_OUT}"] $@"
+        ;;
+        "=")
+            echo -e "[${GREEN_OUT}="${OFF_OUT}"] ${BOLD_OUT}Success:${OFF_OUT} $@!"
+        ;;
+        ".")
+            echo -e "    $@"
+        ;;
+        *)
+            echo -e "[$type] $@"
+        ;;
+    esac
+}
+
+check_integrity(){
+    if [[ ! -f "$1/.target" ]]; then
+        msg ! Module Corrupted
+        msg . Modules are expected to have a .target file.
+        return 1
+    fi
+    
+    if [[ ! -f "$1/.stow-local-ignore" ]]; then
+        msg ! Module Corrupted
+        msg . Modules are expected to have a .stow-local-ignore file.
+        return 2
+    fi
+    
+    if [[ ! -f "$1/.dependencies" ]]; then
+        msg ! Module Corrupted
+        msg . Modules are expected to have a .dependencies file.
+        return 3
+    fi
+    
+    if [[ ! -f "$1/.dep_count" ]]; then
+        msg - ./dep_count file not found
+        msg . Modules are expected to have a ./dep_count file.
+        msg H Setting .dep_count to 0 
+        echo "0" > "$1/.dep_count"
+        return 4
+    fi
+}
+
+process(){
+    grep -vE '^\s*(#|$)' $@ 
+}
