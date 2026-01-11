@@ -12,6 +12,10 @@ fi
 echo "[=] List of modules:"
 for module in "$DOTFILES_DIR"/*;do
     if [ -d "$module" ];then
+        "$DOTFILES_DIR/validity_check" "$module"
+        if (( $? != 0 ));then
+            echo "[!] validity check exited with error code $?"
+        fi
         dep_count=$(<"$module/.dep_count")
         if [[ -e "$module/.is_not_dep" ]];then
             echo "  - ${module##*/}: [ACTIVATED] dependency to $((dep_count - 1)) modules"

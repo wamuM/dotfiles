@@ -24,6 +24,6 @@ if [[ ! -f "$1/.dep_count" ]]; then
     echo "[#] Attempting to recover module"
     echo "0" > "$1/.dep_count" 
     echo "[+] Module recovered by setting dependencies count to 0"
-    exit 7
+    exit 0
 fi
 
