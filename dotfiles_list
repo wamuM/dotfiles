@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo "[=] List of applied modules:"
+for module in "$DOTFILES_DIR"/*;do
+    if [ -d "$module" ];then
+        dep_count=$(<"$module/.dep_count")
+        if [[ -e "$module/.is_not_dep" ]];then
+            echo "  - ${module##*/}: [ACTIVATED] dependency to $((dep_count - 1)) modules"
+        else 
+            echo "  - ${module##*/}: dependency to $dep_count modules"
+        fi
+    fi
+done

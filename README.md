@@ -7,7 +7,7 @@ and it was a great experience, I would definitively recommend it.
 But after learning about [Nix](nix)'s [home-manager](hm)
 my needs have changed drastically. 
 
-For anyone unfamiliar [home-manager](hm) is a way to manager your user configuration. 
+For anyone unfamiliar [home-manager](hm) is a way to manage your user configuration. 
 Using it you get a bunch of "super" config files, **all written on the same language**, 
 that generate the actual configuration files where you would expect them to be (`~/.config/`, etc.). 
 
@@ -28,9 +28,27 @@ Which is why I needed a more hybrid approach that would let me do the following:
 After some research I found that the best way to match those needs was using [stow](https://www.youtube.com/watch?v=y6XCebnB9gs)
 
 ## How it works 
-It is highly recommended to add `./dotfiles` to the path or creating an alias for it. 
+> [!NOTE]
+> It is highly recommended to add `./dotfiles` to the path or to create an alias for it. 
 
-You can use ``./dotfiles help`` for more info
+To manage your dotfiles this system uses `dotfiles` which is a script that implements two features: add and remove.
+`dotfiles` is basically a wrapper around `stow` that makes it slightly more versatile and less verbose to use.
+### dotfiles apply <module1...>
+This subcommand applies a lit of modules to your system, that is, it goes to each module 
+and symlinks each config file to its relevant path so it affects the system. 
+If a module has another module as a dependency it automatically applies them too. 
+
+### The ./add_module.sh script
+You can create new modules using this script, if you directly create directories you might forget 
+to add some metafiles that `dotfiles` uses. 
+Be very careful not to create circular dependencies.
+
+### dotfiles remove <module1...>
+This subcommands reverts the effects of `dotfiles apply`. It removes the modules from the system and their dependencies
+unless the dependencies where applied as a proper module or by another module. 
+> [!NOTE]
+> You can use ``./dotfiles help`` for more info
+
 ## Complementary configuration systems
 As I explained before, I have various kinds of machines with different configuration needs. 
 They can be grouped into the following categories:

@@ -5,7 +5,7 @@ DOTFILES_DIR="${SCRIPT_PATH%/*}"
 export DOTFILES_DIR
 
 usage() {
-    echo "[?] Usage: dotfiles " >&2
+    cat $DOTFILES_DIR/dotfiles_help.txt >&2
 }
 
 call(){
@@ -27,11 +27,14 @@ case "$SUBCOMMAND" in
         ;;
     remove|revert|r|delete|deactivate)
         call dotfiles_remove $@
-        echo "[=] Module successfully removed"
+        echo "[=] Module successfully deactivated"
         ;;
     help|h|man|--help|-h)
         exec 2>&1
         usage
+        ;;
+    list|l)
+        call dotfiles_list $@
         ;;
     *)
         echo "[!] Fatal: Unknown command '$SUBCOMMAND'" >&2

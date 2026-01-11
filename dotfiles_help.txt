@@ -1,0 +1,17 @@
+[?] Usage: dotfiles <subcommand> <module1> ... <moduleN> 
+    - dotfiles help|h|-h
+        Prints this message into stdout
+    - dotfiles apply|add|a
+        Applies the list of modules to the system, including their dependencies
+        If the -d|--dependency flag is provided before the list of modules they will be 
+        treated as a dependency.
+    - dotfiles remove
+        Removes the list of modules from the system including their dependencies as long as the module is
+        not a dependency to another module
+    - dotfiles list
+        List all modules and relevant information
+    Exampples:
+        dotfiles remove auto-tmux
+            -> Removes auto-tmux and its depdendencies
+        dotfiles add bashrc.d tmux nvim
+            -> Applies the bashrc.d, tmux and nvim modules
