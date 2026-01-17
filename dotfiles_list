@@ -10,18 +10,50 @@ if [[ -z "$DOTFILES_DIR" ]]; then
 fi
 source "$DOTFILES_DIR/dotfiles_lib"
 
-msg + "List of modules:"
-for module in "$DOTFILES_DIR"/*;do
-    if [ -d "$module" ];then
-        check_integrity "$module"
-        if (( $? != 0 ));then
-            msg ! "Integrity check failed with error code $1"
-        fi
-        dep_count=$(<"$module/.dep_count")
-        if [[ -e "$module/.is_not_dep" ]];then
-            msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
-        else 
-            msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
-        fi
-    fi
-done
+if (( $# == 1 ));then
+	if [ -t 1 ]; then
+		msg + "List of module '$1' dependencies"
+	fi
+	for module in "$DOTFILES_DIR"/*;do
+		if [ -d "$module" ];then
+			check_integrity "$module"
+	        	if (( $? != 0 ));then
+	            		msg ! "Integrity check failed with error code $1"
+	        	fi
+        		mapfile -t DEPENDENCIES < <(process "$module/.dependencies") 
+            		for dep in "${DEPENDENCIES[@]}"; do
+				if [[ "$dep" == "$1" ]];then
+					if [ -t 1 ];then
+                    				msg . "- ${module##*/}"
+					else
+						echo "${module##*/}"
+					fi
+				fi
+            		done
+		fi
+	done
+else
+	if [ -t 1 ]; then
+		msg + "List of modules:"
+	fi
+	for module in "$DOTFILES_DIR"/*;do
+	    if [ -d "$module" ];then
+	        check_integrity "$module"
+	        if (( $? != 0 ));then
+	            msg ! "Integrity check failed with error code $1"
+	        fi
+	        dep_count=$(<"$module/.dep_count")
+		if [ -t 1 ];then
+	        	if [[ -e "$module/.is_not_dep" ]];then
+	        	    msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
+	        	else 
+	        	    msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
+	        	fi
+		else
+	        	if [[ -e "$module/.is_not_dep" ]];then
+				echo "${module##*/}"
+	        	fi
+		fi
+	    fi
+	done
+fi
