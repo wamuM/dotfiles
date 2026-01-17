@@ -40,6 +40,9 @@ case "$SUBCOMMAND" in
     list|l)
         call dotfiles_list $@
         ;;
+    clear|c)
+        call dotfiles_clear $@
+        ;;
     *)
         msg ! "Unknown command '$SUBCOMMAND'"
         usage

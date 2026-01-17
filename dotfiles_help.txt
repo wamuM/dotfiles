@@ -3,6 +3,10 @@
 
     - dotfiles list
         List all modules and relevant information
+	(if pipped it only lists active modules)
+
+    - dotfiles list <module>
+        List all of <module>'s dependencies
 
     - dotfiles apply|add|a <module1> .. <moduleN>
         Applies the list of modules to the system, including their dependencies
@@ -15,6 +19,9 @@
 
     - dotfiles update <module1> .. <moduleN>
         Updates the list of modules (removes and then adds again)
+
+    - dotfiles clear
+    	Removes all activated modules
 
     Examples:
         dotfiles remove auto-tmux

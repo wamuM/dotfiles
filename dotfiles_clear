@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [[ -z "$DOTFILES_DIR" ]]; then
+    echo "[!] Fatal: DOTFILES_DIR is not set" >&2
+    echo "    this usually happens when someone tries to execute 'dotfiles_clear' directly" >&2
+    echo "    which is not recommended. Instead use 'dotfiles clear' which is a wrapper that" >&2
+    echo "    sets all required environment variables." >&2
+    exit 2
+fi
+source "$DOTFILES_DIR/dotfiles_lib"
+
+if [[ $# -gt 0 ]]; then
+    msg ! "Wrong argument count"
+    exit 1
+fi
+
+mapfile -t activated_modules < <("$DOTFILES_DIR/dotfiles" "list") 
+if (( ${#activated_modules[@]} > 0 )); then
+   "$DOTFILES_DIR/dotfiles" "remove" "${activated_modules[@]}" 
+   if (( $? != 0 ));then
+       msg ! "Something failed while removing modules"
+       exit 2
+   fi
+else
+   msg + "No modules activated"
+fi
+
