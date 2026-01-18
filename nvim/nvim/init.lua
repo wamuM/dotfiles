@@ -2,6 +2,7 @@
 vim.g.mapleader = " "
 
 require("config.lazy")
+require("config.lsp")
 
 --  Long Lines
 vim.opt.wrap = false           -- Disable line wrapping
@@ -19,7 +20,6 @@ vim.opt.expandtab = true
 
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
-
 
 -- Remove highlighting if escaping in normalmode 
 vim.keymap.set("n", "<esc>", function() vim.cmd('nohlsearch') end, { noremap=true, silent = true })
