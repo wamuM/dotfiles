@@ -6,13 +6,17 @@ if [[ -z "$DOTFILES_DIR" ]]; then
     echo "    this usually happens when someone tries to execute 'dotfiles_list' directly" >&2
     echo "    which is not recommended. Instead use 'dotfiles list' which is a wrapper that" >&2
     echo "    sets all required environment variables." >&2
-    exit 2
+    exit 1
 fi
 source "$DOTFILES_DIR/dotfiles_lib"
 
 if (( $# == 1 ));then
+    if [[ ! -d "$DOTFILES_DIR/$1" ]];then
+        msg ! "Module '$1' does not exist!"
+        exit 2
+    fi
 	if [ -t 1 ]; then
-		msg + "List of module '$1' dependencies"
+		msg + "List of module '$1' dependencies:"
 	fi
 	for module in "$DOTFILES_DIR"/*;do
 		if [ -d "$module" ];then
@@ -45,9 +49,17 @@ else
 	        dep_count=$(<"$module/.dep_count")
 		if [ -t 1 ];then
 	        	if [[ -e "$module/.is_not_dep" ]];then
-	        	    msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
+                    if (( $dep_count == 2));then
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}1${OFF_OUT} module"
+                    else
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
+                    fi
 	        	else 
-	        	    msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
+                    if (( $dep_count == 1));then
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}1${OFF_OUT} module"
+                    else
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
+                    fi
 	        	fi
 		else
 	        	if [[ -e "$module/.is_not_dep" ]];then
