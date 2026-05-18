@@ -57,6 +57,11 @@ They can be grouped into the following categories:
   which interally uses this repo for the VMs as if they were bare linux machines.
 - [NixOS](nix): they use my [nixos-config repo](https://github.com/wamuM/nixos-config) which interally uses this repo and
   [home-manager](hm) 
+## Installing it on your system
+Just clone the repo somewhere in your system (I have mine at ~/Dotfiles/). 
+> [!NOTE]
+> This repo has other repos inside as submodules so you should do `git clone --recurse-submodules <...>`  
+> and `git pull --recurse-submodules`
 ## Dependencies 
 For this to work you need to have the following programs installed:
 - stow

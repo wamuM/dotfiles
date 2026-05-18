@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+session=$(tmux display-message -p '#S')
+server_id=$(tmux display-message -p "#{pid}")
+
+ancestor_terminal(){
+    pid=${1// /}
+    if [[ "$pid" == "1" || -z "$pid" ]]; then
+        return 1
+    fi
+    tty=$(ps -p "$pid" -o tty | tail -n1)
+    if [[ "$tty" == "?" ]]; then
+        echo "$pid"
+        return 0
+    else
+        ppid=$(ps --pid "$pid" -o ppid  2>/dev/null | tail -n1)
+        ancestor_terminal "$ppid"
+    fi
+}
+
+tmux list-clients -t "$session" -F "#{client_tty}" | while read dev; do
+    tty="${dev#/dev/}"
+    tmux_client_pid="$(pgrep -t "$tty" -f "tmux" 2>/dev/null)"
+    term_pid=$(ancestor_terminal "$tmux_client_pid" 2>/dev/null)
+    window_id=$(xdotool search --pid "$term_pid" 2>/dev/null)
+    if [ -z "$window_id" ];then
+        continue
+    fi
+    if [ -z "$session" ];then
+        xdotool set_window --name "tmux" "$window_id"
+    else
+        xdotool set_window --name "$session - tmux" "$window_id"
+    fi
+done
