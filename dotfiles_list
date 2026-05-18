@@ -16,7 +16,7 @@ if (( $# == 1 ));then
         exit 2
     fi
 	if [ -t 1 ]; then
-		msg + "List of module '$1' dependencies:"
+		msg + "List of module '$1' reverse dependencies:"
 	fi
 	for module in "$DOTFILES_DIR"/*;do
 		if [ -d "$module" ];then
@@ -24,11 +24,17 @@ if (( $# == 1 ));then
 	        	if (( $? != 0 ));then
 	            		msg ! "Integrity check failed with error code $1"
 	        	fi
+
         		mapfile -t DEPENDENCIES < <(process "$module/.dependencies") 
-            		for dep in "${DEPENDENCIES[@]}"; do
+            	for dep in "${DEPENDENCIES[@]}"; do
 				if [[ "$dep" == "$1" ]];then
 					if [ -t 1 ];then
-                    				msg . "- ${module##*/}"
+	                    dep_count=$(<"$module/.dep_count")
+                        if (( $dep_count > 0 ));then
+                    		msg . "- [${GREEN_OUT}ENABLED${OFF_OUT}] ${module##*/}"
+                        else
+                    		msg . "- [${GREY_OUT}OFF${OFF_OUT}] ${module##*/}"
+                        fi
 					else
 						echo "${module##*/}"
 					fi
@@ -50,15 +56,17 @@ else
 		if [ -t 1 ];then
 	        	if [[ -e "$module/.is_not_dep" ]];then
                     if (( $dep_count == 2));then
-	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}1${OFF_OUT} module"
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}MANUAL${OFF_OUT}] dependency to ${YELLOW_OUT}1${OFF_OUT} active module"
                     else
-	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}APPLIED${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} modules"
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREEN_OUT}MANUAL${OFF_OUT}] dependency to ${YELLOW_OUT}$((dep_count - 1))${OFF_OUT} active modules"
                     fi
 	        	else 
-                    if (( $dep_count == 1));then
-	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}1${OFF_OUT} module"
+                    if (( $dep_count == 0));then
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${GREY_OUT}OFF${OFF_OUT}] dependency to ${YELLOW_OUT}0${OFF_OUT} active modules"
+                    elif (( $dep_count == 1));then
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${YELLOW_OUT}AUTOMATIC${OFF_OUT}] dependency to ${YELLOW_OUT}1${OFF_OUT} active module"
                     else
-	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} modules"
+	        	        msg . "- ${BOLD_OUT}${module##*/}${OFF_OUT}: [${YELLOW_OUT}AUTOMATIC${OFF_OUT}] dependency to ${YELLOW_OUT}$dep_count${OFF_OUT} active modules"
                     fi
 	        	fi
 		else

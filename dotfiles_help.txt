@@ -6,7 +6,7 @@
 	(if pipped it only lists active modules)
 
     - dotfiles list <module>
-        List all of <module>'s dependencies
+        List all of <module>'s reverse dependencies
 
     - dotfiles apply|add|a <module1> .. <moduleN>
         Applies the list of modules to the system, including their dependencies

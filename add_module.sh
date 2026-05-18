@@ -17,6 +17,7 @@ echo "[+] Adding ignored files"
 for f in "${ignored_files[@]}"; do
     echo "$f" >> "./$name/.stow-local-ignore"
 done
+echo ".git" >> "./$name/.stow-local-ignore"
 
 touch "./$name/.dependencies"
 echo "[+] Adding dependencies"

@@ -4,6 +4,7 @@ GREEN="\e[32m"
 YELLOW="\e[33m"
 BLUE="\e[34m"
 BOLD="\e[1m"
+GREY="\e[90m"
 OFF="\e[0m"
 if [ -t 1 ];then
     RED_OUT=$RED;
@@ -11,6 +12,7 @@ if [ -t 1 ];then
     GREEN_OUT=$GREEN;
     YELLOW_OUT=$YELLOW;
     BOLD_OUT=$BOLD;
+    GREY_OUT=$GREY;
     OFF_OUT=$OFF;
 else
     RED_OUT="";BLUE_OUT="";GREEN_OUT="";BOLD_OUT="";OFF_OUT="";YELLOW_OUT="";

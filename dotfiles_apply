@@ -78,7 +78,7 @@ stow --target "$TARGET"                 \
      $1 2>&1
 if (( $? != 0 ));then
     msg ! "Stow returned error code $?"
-    exit $(?+1)
+    exit $((?+1))
 fi
 msg = "stow $1 has been applied" 
    
