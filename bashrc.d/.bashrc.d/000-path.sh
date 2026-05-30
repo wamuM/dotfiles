@@ -3,4 +3,4 @@
 # ===============================================
 # A modification on the path
 
-export PATH=".:$PATH"
+export PATH="$PATH"
