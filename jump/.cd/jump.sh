@@ -3,7 +3,7 @@ usage(){
     echo "    where <alias> is the name of a symlink in $JUMP_DIR"
     echo "    you can also do"
     echo "    jump add <dir> <alias>    to add an alias"
-    echo "    jump remove <alias>       to remove an alias"
+    echo "    jump remove|rm <alias>       to remove an alias"
     echo "    jump list                 to list all the aliases"
 }
 
@@ -12,11 +12,20 @@ if [[ $# -eq 1 ]];then
         echo "[=] list of aliases:"
         for f in "$JUMP_DIR"/*;do
             if [[ -L "$f"  ]]; then
-                echo "$(basename "$f") : $(readlink "$f")"
+                path=$(readlink "$f")
+                if [[ -e "$path" ]];then
+                    echo "- [valid] $(basename "$f") -> $path"
+                else
+                    echo "- [broken] $(basename "$f") -> $path"
+                fi
             fi
         done
-    elif [[ -e "$JUMP_DIR/$1" ]];then
-        cd "$(readlink "$JUMP_DIR/$1")"
+    elif [[ -L "$JUMP_DIR/$1" ]];then
+        if [[ -e "$JUMP_DIR/$1" ]];then
+            cd "$(readlink "$JUMP_DIR/$1")"
+        else
+            echo "[!] Fatal: The alias is broken"
+        fi
     else 
         echo "[!] Fatal: The cd alias doesn't exist"
         usage
@@ -37,7 +46,7 @@ elif [[ $# -ge 2 ]];then
             echo "[!] <dir>($2) needs to be a directory"
             usage
         fi
-    elif [[ "$1" == "remove" ]];then
+    elif [[ "$1" == "remove" || "$1" == "rm" ]];then
         if [[ -L "$JUMP_DIR/$2" ]];then
             rm "$JUMP_DIR/$2"
             echo "[=] Alias '"$2"' removed"
