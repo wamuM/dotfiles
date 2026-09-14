@@ -38,13 +38,35 @@ alias suspend="systemctl suspend"
 ## To see stdout and stderr clearly
 alias std="$SCRIPTS_DIR/std.sh"
 
+## To launch a program independently
+detach() {
+    echo $@
+    setsid $@ </dev/null >/dev/null 2>&1 &
+}
+alias dch="detach"
+
 alias open="xdg-open"
 alias o="open"
 
 ## Fuzzy Finder
 alias f="fzf"
 
-## [GLArena - for GEI/G]
-alias glarena="~/Documents/GEI/G/arena/GLarena"
-alias glarenasl="~/Documents/GEI/G/arena/GLarenaSL"
-alias glarenapl="~/Documents/GEI/G/arena/GLarenaPL"
+## Alert long commands
+beep() {
+    play -q -n synth 0.05 sine 800
+}
+
+alert() {
+    "$@"
+    local status=$?
+
+    if [ "$status" -eq 0 ]; then
+        notify-send "Successful command" "$*"
+    else
+        notify-send "Error with command" "$*"
+    fi
+
+    beep
+    return "$status"
+}
+
