@@ -294,6 +294,11 @@ root.buttons(gears.table.join(
 -- {{{ Key bindings
 globalkeys = gears.table.join(
 --- awesome
+    awful.key({ modkey }, "w", function()
+            local s = awful.screen.focused()
+            s.mywibox.visible = not s.mywibox.visible
+            end,
+            {description="hide wibox", group ="awesome"}),
     awful.key({ modkey,            }, "s",      hotkeys_popup.show_help,
               {description = "show help",  group = "awesome"}),
 
@@ -400,6 +405,24 @@ globalkeys = gears.table.join(
 
     awful.key({ modkey, "Shift" }, "k", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
+
+    awful.key({ modkey, "Shift", "Control"}, "j", function() 
+            local c = client.focus 
+            if c then
+                local next_screen = (c.screen.index - 2 % screen.count())+1
+                c:move_to_screen(next_screen)
+            end 
+            end,
+            {description = "move client to next screen", group = "screen"}),
+
+    awful.key({ modkey, "Shift", "Control"}, "k", function () 
+            local c = client.focus 
+            if c then
+                local next_screen = c.screen.index % screen.count()-1
+                c:move_to_screen(next_screen)
+            end
+            end,
+            {description = "move client to previous screen", group = "screen"}),
 --- 
 
     awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
