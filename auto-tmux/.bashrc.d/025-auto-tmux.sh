@@ -14,11 +14,19 @@ alert(){
     echo "[WARNING] [WARNING] [WARNING] [WARNING] [WARNING] [WARNING] [WARNING] [WARNING] "
     echo "================================================================================"
 }
+alias suicide="touch ~/.suicide && tmux kill-session"
+alias quit="tmux kill-session"
+
 
 if [[ $- == *i* ]]; then
     if [ -z "$TMUX" ]; then
         clear
         tmux-picker 
         alert
+        if [[ -f ~/.suicide ]]; then
+            rm ~/.suicide
+            exit
+        fi
+        echo "[WARNING] You are no longer in a tmux session, you can run 'tmux-picker' to choose one"
     fi
 fi

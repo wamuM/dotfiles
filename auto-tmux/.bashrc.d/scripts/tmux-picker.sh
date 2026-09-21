@@ -1,19 +1,19 @@
+session_count="$(tmux has-session 2>/dev/null && tmux list-sessions | wc -l || echo 0)"
+
 new_session(){
     if [ -z "$1" ];then
         echo "=========================================="
         echo " Tmux Session Picker "
         echo "=========================================="
-        read -r -p "New session name (empty to quit): " name
+        read -r -p "New session name (default: 'T$session_count'): " name
         if [ ! -n "$name" ]; then
-            exit 2
+            name="T$session_count"
         fi
     else
         name="$1"
     fi
     tmux new-session -s "$name"\; send-keys "$HOME/.bashrc.d/scripts/welcome.sh" C-m
 }
-
-session_count="$(tmux has-session 2>/dev/null && tmux list-sessions | wc -l || echo 0)"
 
 if (( $session_count == 0 ));then
     new_session
