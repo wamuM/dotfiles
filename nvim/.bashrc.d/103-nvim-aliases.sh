@@ -1,4 +1,20 @@
 # Edit config files
-alias ven='nvim ~/.config/nvim -c "Telescope find_files"'
-# Telescope directory
-alias ven='nvim -c "Telescope find_files"'
+
+vff() {
+    local p="${1:-.}"
+    local file
+    local status
+
+    file=$(cd "$p" && fzf)
+
+    local status=$?
+
+    if (( $status != 0 )); then
+        echo "fzf cancelled or failed (exit $status)"
+        return "$status"
+    fi
+
+    nvim "$p/$file"
+}
+
+alias ven="vff ~/.config/nvim/"
