@@ -87,6 +87,12 @@ terminal = "st"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
 
+-- Global State
+local show_titlebars = false;
+local toggle_gap = false;
+local theme_gap = beautiful.useless_gap;
+local theme_border = beautiful.border_width;
+
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -294,6 +300,34 @@ root.buttons(gears.table.join(
 -- {{{ Key bindings
 globalkeys = gears.table.join(
 --- awesome
+    awful.key({ modkey }, "d", function()
+            -- Toggle titlebar
+            show_titlebars = not show_titlebars
+            local clients = client.get()
+            for i = 1, #clients do
+                if show_titlebars then
+                    awful.titlebar.show(clients[i])
+                else
+                    awful.titlebar.hide(clients[i])
+                end
+            end
+           -- Toggle gap
+           toggle_gap = not toggle_gap;
+           if toggle_gap then
+               beautiful.useless_gap = theme_gap;
+           --    beautiful.border_width = theme_border;
+           else
+               beautiful.useless_gap = 0;
+           --   beautiful.border_width = 0;
+           end
+           for _,c in ipairs(client.get()) do
+           --     c.border_width = beautiful.border_width
+           end
+           for s in screen do
+                awful.layout.arrange(s)
+           end
+            end,
+            {description="hide window decorations", group ="awesome"}),
     awful.key({ modkey }, "w", function()
             local s = awful.screen.focused()
             s.mywibox.visible = not s.mywibox.visible
@@ -686,13 +720,22 @@ client.connect_signal("request::titlebars", function(c)
         },
         layout = wibox.layout.align.horizontal
     }
+    if not show_titlebars then
+        awful.titlebar.hide(c)
+    end
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
-    c:emit_signal("request::activate", "mouse_enter", {raise = false})
-end)
+--client.connect_signal("mouse::enter", function(c)
+--    c:emit_signal("request::activate", "mouse_enter", {raise = false})
+--end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+if not toggle_gap then
+    beautiful.useless_gap = 0;
+    for s in screen do
+        awful.layout.arrange(s)
+    end
+end
